@@ -9,4 +9,3 @@ spec:
   ports:
     - port: 80       # Service port
       targetPort: 80 # Pod port
-      nodePort: 30007 # external port on kind node

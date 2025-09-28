@@ -8,9 +8,9 @@ Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
 
 ## Files
 
-- `kind-config.yaml` → Kind cluster config (maps NodePort 30007 to localhost since the cluster runs in a container).  
+- `kind-config.yaml` → Kind cluster config.  
 - `config/nginx-deployment.yaml` → Nginx Deployment (3 replicas).  
-- `config/nginx-service.yaml` → NodePort Service exposing Nginx on port 30007.
+- `config/nginx-service.yaml` → ClusterIP Service exposing Nginx on port 80.
 
 ## Usage
 
@@ -33,13 +33,21 @@ kubectl get nodes
 kubectl apply -f configs/
 ```
 
-3. Access Nginx:
+3. Forward a local port to a port on the Pod 
 
+In a different terminal:
 ```bash
-http://localhost:30007
+kubectl port-forward svc/nginx-service 8080:80
 ```
 
-4. Verify
+
+4. Access Nginx:
+
+```bash
+http://localhost:8080
+```
+
+5. Verify
 
 To check Kubernetes objects:
 
