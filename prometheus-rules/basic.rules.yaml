@@ -1,0 +1,42 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: basic-rules
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: infra.rules
+    rules:
+    - alert: HighNodeCPU
+      expr: (1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) > 0.90
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "High node CPU (>90%) on {{ $labels.instance }}"
+
+    - alert: PodRestarts
+      expr: increase(kube_pod_container_status_restarts_total[5m]) > 0
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "Pod {{ $labels.pod }} restarted in last 5m"
+
+    - alert: DeploymentUnavailable
+      expr: kube_deployment_status_replicas_available < kube_deployment_spec_replicas
+      for: 10m
+      labels: {severity: critical}
+      annotations:
+        summary: "Deployment {{ $labels.deployment }} unavailable"
+
+  - name: nginx.rules
+    rules:
+    - alert: NginxHigh5xxRate
+      expr: |
+        sum(rate(nginx_http_requests_total{status=~"5.."}[5m]))
+        /
+        sum(rate(nginx_http_requests_total[5m])) > 0.05
+      for: 5m
+      labels: {severity: warning}
+      annotations:
+        summary: "NGINX 5xx > 5% for 5m"

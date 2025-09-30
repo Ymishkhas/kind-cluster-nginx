@@ -1,23 +1,26 @@
-# Kind + Nginx Demo
+# Kubernetes Monitoring with Prometheus & Grafana on Kind cluster
 
-This repo shows how to run Nginx on a Kind cluster with a Deployment and Service.
+This project demonstrates how to deploy the Prometheus monitoring stack on a Kind cluster using Helm, and how to monitor an NGINX Deployment with custom metrics, Grafana dashboards, and alerting rules.
 
-## Ptrrequisit
+## Features
 
-Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/)
+- Prometheus + Grafana via Helm (kube-prometheus-stack)
+- Custom values for prometheus configured via values.yaml
+- NGINX Deployment with Prometheus exporter sidecar
+- ServiceMonitor for scraping NGINX metrics
+- Grafana dashboard for live visualization
+- PrometheusRules for alerts (CPU, restarts, availability, NGINX 5xx errors)
 
-## Files
+## Prequisit
 
-- `kind-config.yaml` → Kind cluster config.  
-- `config/nginx-deployment.yaml` → Nginx Deployment (3 replicas).  
-- `config/nginx-service.yaml` → ClusterIP Service exposing Nginx on port 80.
+Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/), [helm](https://helm.sh/docs/intro/install/)
 
-## Usage
+## Setup Instructions
 
-1. Create the cluster:
+### 1. Create the cluster:
 
 ```bash
-kind create cluster --name nginx-cluster --config kind-config.yaml
+kind create cluster --name nginx-cluster --config kind/kind-config.yaml
 ```
 
 Verify:
@@ -27,48 +30,61 @@ kubectl cluster-info
 kubectl get nodes
 ```
 
-2. Apply Configs:
+### 2. Install Prometheus Stack
 
 ```bash
-kubectl apply -f configs/
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f helm/prometheus/values.yaml --version 77.12.0
 ```
 
-3. Forward a local port to a port on the Pod 
+### 3. Deploy NGINX with Exporter
 
-In a different terminal:
 ```bash
+kubectl apply -f nginx/
 kubectl port-forward svc/nginx-service 8080:80
 ```
 
+Can access from http://localhost:8080
 
-4. Access Nginx:
-
-```bash
-http://localhost:8080
-```
-
-5. Verify
-
-To check Kubernetes objects:
+### 4. Verify Metrics Flow
 
 ```bash
-kubectl get deployments 
-kubectl get pods
-kubectl get svc
+kubectl port-forward svc/prometheus-operated -n monitoring 9090:9090
 ```
 
-Delete a pod:
+Open http://localhost:9090/targets → ensure nginx-exporter targets are UP.
+
+Test queries:
+`up{job="nginx-exporter"}`
+`nginx_connections_active`
+`rate(nginx_connections_accepted[1m])`
+
+### 4. Visualize in Grafana
 
 ```bash
-kubectl delete pod <pod-name>
+kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80 
 ```
 
-Kubernetes recreates it automatically (self-healing)
+- URL: http://localhost:3000
+- Default login: admin / prom-operator
+- Import Grafana dashboard ID 12708 (NGINX exporter(community)).
+
+### 5. Enable Alerts
+
+``` bash
+kubectl apply -f prometheus-rules/basic.rules.yaml
+```
+Check in Prometheus → Status → Rules / Alerts.
+
 
 ## Clean up
 
 ``` bash
-kubectl delete service nginx-service
-kubectl delete deployment nginx-deployment
+kubectl delete -f nginx/
+kubectl delete -f prometheus-rules/basic.rules.yaml
+helm uninstall monitoring -n monitoring
+kubectl delete namespace monitoring
 kind delete cluster --name nginx-cluster
 ```
