@@ -13,11 +13,9 @@ This project demonstrates how to deploy the Prometheus monitoring stack on a Kin
 
 ## Prequisit
 
-Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/), [helm](https://helm.sh/docs/intro/install/)
+Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) [helm](https://helm.sh/docs/intro/install/) [helmfile](https://github.com/helmfile/helmfile)
 
-## Setup Instructions
-
-### 1. Create the cluster:
+### Create the cluster:
 
 ```bash
 kind create cluster --name nginx-cluster --config kind/kind-config.yaml
@@ -30,16 +28,18 @@ kubectl cluster-info
 kubectl get nodes
 ```
 
-### 2. Install Prometheus Stack
+## Setup Instructions
+
+### 1. Install Prometheus Stack via helmfile
 
 ```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-
-helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace -f helm/prometheus/values.yaml --version 77.12.0
+helmfile -e dev apply
 ```
 
-### 3. Deploy NGINX with Exporter
+> [!NOTE] helmfile apply - Error about CRDs
+> It's Helmfile and helm-diff's problem where it checks if CRDs installed but errors out since its part of the stack. The solution is in `disableValidation: true` flag in helmfile.yaml. Please uncomment this line for the first instalment, after that you can comment it back. For reference of [Github issue](https://github.com/roboll/helmfile/issues/1353)
+
+### 2. Deploy NGINX with Exporter
 
 ```bash
 kubectl apply -f nginx/
@@ -48,7 +48,7 @@ kubectl port-forward svc/nginx-service 8080:80
 
 Can access from http://localhost:8080
 
-### 4. Verify Metrics Flow
+### 3. Verify Metrics Flow
 
 ```bash
 kubectl port-forward svc/prometheus-operated -n monitoring 9090:9090
