@@ -49,19 +49,23 @@ kubectl apply -f nginx/
 
 Istio Ingress Gateway allow to access the NGINX service through a custom domain (yousef.localhost).
 
+Apply the Gateway and VirtualService:
+```bash
+kubectl apply -f istio/traffic/
+```
+
 For local development:
 Port-forward the Istio ingress gateway:
 ```bash
 kubectl -n istio-ingress port-forward svc/istio-ingress 80:80
 ```
 
-Apply the Gateway and VirtualService:
-```bash
-kubectl apply -f istio/traffic/
-```
 
 Visit http://yousef.localhost in your browser.
 You should see the NGINX welcome page.
+
+> For development on Kind, the Istio ingress Service type is ClusterIP.
+> In production, this would typically be a LoadBalancer fronted by DNS.
 
 ## Monitoring
 

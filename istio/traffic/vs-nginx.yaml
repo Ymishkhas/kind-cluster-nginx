@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: nginx-vs
-  namespace: default
+  namespace: istio-ingress
 spec:
   hosts: [ "yousef.localhost" ]
   gateways: 
