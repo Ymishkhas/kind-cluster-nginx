@@ -7,6 +7,8 @@ helmDefaults:
 repositories:
   - name: prometheus-community
     url: https://prometheus-community.github.io/helm-charts
+  - name: istio
+    url: https://istio-release.storage.googleapis.com/charts
 
 environments:
   dev:
@@ -15,6 +17,7 @@ environments:
 
 ---
 releases:
+  # Prometheus Monitoring Stack
   - name: monitoring
     namespace: monitoring
     chart: prometheus-community/kube-prometheus-stack
@@ -23,3 +26,32 @@ releases:
       - values/prometheus/values.yaml
       - environments/{{ .Environment.Name }}.yaml
     # disableValidation: true # Please comment this line after the first install, its a work around helm-diff issue regarding CRDs
+
+  # Istio
+  # CRDs/base
+  - name: istio-base
+    namespace: istio-system
+    chart: istio/base
+    version: 1.27.1
+    values:
+      - values/istio/base.yaml
+
+  # Control plane
+  - name: istiod
+    namespace: istio-system
+    chart: istio/istiod
+    version: 1.27.1
+    needs:
+      - istio-system/istio-base
+    values:
+      - values/istio/istiod.yaml
+
+  # Ingress gateway
+  - name: istio-ingress
+    namespace: istio-ingress
+    chart: istio/gateway
+    version: 1.27.1
+    needs:
+      - istio-system/istiod
+    values:
+      - values/istio/ingress.yaml

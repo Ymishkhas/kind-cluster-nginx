@@ -30,7 +30,7 @@ kubectl get nodes
 
 ## Setup Instructions
 
-### 1. Install Prometheus Stack via helmfile
+### 1. Install Prometheus Stack & Istio Ingress Gateway via helmfile
 
 ```bash
 helmfile -e dev apply
@@ -43,12 +43,29 @@ helmfile -e dev apply
 
 ```bash
 kubectl apply -f nginx/
-kubectl port-forward svc/nginx-service 8080:80
 ```
 
-Can access from http://localhost:8080
+### 3. Expose NGINX via Istio Ingress (Dev)
 
-### 3. Verify Metrics Flow
+Istio Ingress Gateway allow to access the NGINX service through a custom domain (yousef.localhost).
+
+For local development:
+Port-forward the Istio ingress gateway:
+```bash
+kubectl -n istio-ingress port-forward svc/istio-ingress 80:80
+```
+
+Apply the Gateway and VirtualService:
+```bash
+kubectl apply -f istio/traffic/
+```
+
+Visit http://yousef.localhost in your browser.
+You should see the NGINX welcome page.
+
+## Monitoring
+
+### 1. Verify Metrics Flow
 
 ```bash
 kubectl port-forward svc/prometheus-operated -n monitoring 9090:9090
@@ -61,7 +78,7 @@ Test queries:
 `nginx_connections_active`
 `rate(nginx_connections_accepted[1m])`
 
-### 4. Visualize in Grafana
+### 2. Visualize in Grafana
 
 ```bash
 kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80 
@@ -71,7 +88,7 @@ kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
 - Default login: admin / prom-operator
 - Import Grafana dashboard ID 12708 (NGINX exporter(community)).
 
-### 5. Enable Alerts
+### 3. Enable Alerts
 
 ``` bash
 kubectl apply -f prometheus-rules/basic.rules.yaml
