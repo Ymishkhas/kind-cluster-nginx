@@ -13,7 +13,11 @@ This project demonstrates how to deploy the Prometheus monitoring stack on a Kin
 
 ## Prequisit
 
-Must install [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) [helm](https://helm.sh/docs/intro/install/) [helmfile](https://github.com/helmfile/helmfile)
+Must install 
+- [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) 
+- [helm](https://helm.sh/docs/intro/install/) 
+- [helmfile](https://github.com/helmfile/helmfile)
+- [SOPS](https://github.com/getsops/sops) **and** [age](https://github.com/FiloSottile/age) (for SOPS keys)
 
 ### Create the cluster:
 
@@ -28,6 +32,19 @@ kubectl cluster-info
 kubectl get nodes
 ```
 
+### Secrets (SOPS) - Decrypt & Apply
+This repo keeps secrets **encrypted** with SOPS. You’ll need access to the Age private key.
+
+Create the namespace (first run only):
+```bash
+kubectl create namespace monitoring
+```
+
+Apply the Grafana admin Secret:
+```bash
+sops -d secrets/grafana-admin.yaml | kubectl apply -f -
+```
+
 ## Setup Instructions
 
 ### 1. Install Prometheus Stack & Istio Ingress Gateway via helmfile
@@ -36,8 +53,7 @@ kubectl get nodes
 helmfile -e dev apply
 ```
 
-> [!NOTE] helmfile apply - Error about CRDs
-> It's Helmfile and helm-diff's problem where it checks if CRDs installed but errors out since its part of the stack. The solution is in `disableValidation: true` flag in helmfile.yaml. Please uncomment this line for the first instalment, after that you can comment it back. For reference of [Github issue](https://github.com/roboll/helmfile/issues/1353)
+> **Note (first install only):** If you hit a CRD validation error from helm-diff, temporarily enable disableValidation: true on the monitoring release in helmfile.yaml. After the first successful install, comment it back out.
 
 ### 2. Deploy NGINX with Exporter
 
@@ -89,7 +105,8 @@ kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
 ```
 
 - URL: http://localhost:3000
-- Default login: admin / prom-operator
+- Credentials: from your grafana-admin Secret (admin-user / admin-password).
+    - If you don’t use existingSecret, the chart’s historical default was admin / prom-operator (but with existingSecret set, your Secret takes precedence).
 - Import Grafana dashboard ID 12708 (NGINX exporter(community)).
 
 ### 3. Enable Alerts
