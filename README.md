@@ -46,7 +46,7 @@ $env:SOPS_AGE_KEY_FILE="path/to/sops-age-key.txt"
 ### 1. Apply everything via Helmfile 
 
 ```bash
-helmfile -e dev apply
+helmfile apply
 ```
 
 This will apply and create:
