@@ -1,0 +1,15 @@
+{{- if and .Values.metrics.enabled (has "monitoring.coreos.com/v1/ServiceMonitor" .Capabilities.APIVersions) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-servicemonitor
+  namespace: {{ .Release.Namespace }}
+  labels: { release: {{ .Values.metrics.prometheusRelease | default "monitoring" }} }
+spec:
+  selector:
+    matchLabels: { component: exporter }
+  endpoints:
+    - port: http-metrics
+      path: /metrics
+      interval: 15s
+{{- end }}

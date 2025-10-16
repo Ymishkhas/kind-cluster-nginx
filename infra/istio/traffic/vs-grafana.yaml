@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana-vs
+  namespace: istio-ingress
+spec:
+  hosts: [ "grafana.localhost" ]
+  gateways: 
+    - istio-ingress/private-gateway
+  http:
+    - route:
+        - destination:
+            host: monitoring-grafana.monitoring.svc.cluster.local
+            port:
+              number: 80

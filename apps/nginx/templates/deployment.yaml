@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels: { app: nginx }
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app: nginx } }
+  template:
+    metadata: { labels: { app: nginx } }
+    spec:
+      containers:
+      - name: nginx
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports: [{ containerPort: {{ .Values.ports.http }} }]
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      - name: nginx-exporter
+        image: nginx/nginx-prometheus-exporter:0.10.0
+        args: ["-nginx.scrape-uri=http://127.0.0.1:{{ .Values.ports.http }}/stub_status"]
+        ports: [{ containerPort: {{ .Values.ports.metrics }} }]
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config

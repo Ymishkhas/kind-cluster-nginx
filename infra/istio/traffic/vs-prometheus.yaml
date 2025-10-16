@@ -1,15 +1,15 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: nginx-vs
+  name: prom-vs
   namespace: istio-ingress
 spec:
-  hosts: [ "yousef.localhost" ]
+  hosts: [ "prom.localhost" ]
   gateways: 
-    - istio-ingress/main-gateway
+    - istio-ingress/private-gateway
   http:
     - route:
         - destination:
-            host: nginx-service.default.svc.cluster.local
+            host: prometheus-operated.monitoring.svc.cluster.local
             port:
-              number: 80
+              number: 9090

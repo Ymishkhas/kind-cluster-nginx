@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  labels: { app: nginx }
+spec:
+  type: ClusterIP
+  selector: { app: nginx }
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.ports.http }}
+    - name: http-metrics
+      port: {{ .Values.ports.metrics }}
+      targetPort: {{ .Values.ports.metrics }}

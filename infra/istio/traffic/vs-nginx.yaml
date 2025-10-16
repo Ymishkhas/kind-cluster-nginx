@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nginx-vs
+  namespace: istio-ingress
+spec:
+  hosts: [ "yousef.localhost" ]
+  gateways: 
+    - istio-ingress/main-gateway
+  http:
+    - route:
+        - destination:
+            host: nginx-service.default.svc.cluster.local
+            port:
+              number: 80

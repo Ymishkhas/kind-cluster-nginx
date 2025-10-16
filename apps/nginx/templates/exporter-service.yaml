@@ -9,6 +9,6 @@ spec:
   selector:
     app: nginx
   ports:
-    - name: metrics
-      port: 9113
-      targetPort: 9113
+    - name: http-metrics
+      port: {{ .Values.ports.metrics }}
+      targetPort: {{ .Values.ports.metrics }}

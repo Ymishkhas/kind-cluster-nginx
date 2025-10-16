@@ -10,33 +10,16 @@ repositories:
   - name: istio
     url: https://istio-release.storage.googleapis.com/charts
 
-environments:
-  dev:
-    values:
-      - environments/dev.yaml
-
----
 releases:
-  # Prometheus Monitoring Stack
-  - name: monitoring
-    namespace: monitoring
-    chart: prometheus-community/kube-prometheus-stack
-    version: 77.12.0
-    values:
-      - values/prometheus/values.yaml
-      - environments/{{ .Environment.Name }}.yaml
-    # disableValidation: true # Please comment this line after the first install, its a work around helm-diff issue regarding CRDs
-
-  # Istio
-  # CRDs/base
+  # --- Istio base (CRDs) ---
   - name: istio-base
     namespace: istio-system
     chart: istio/base
     version: 1.27.1
     values:
-      - values/istio/base.yaml
+      - infra/istio/values/base.yaml
 
-  # Control plane
+  # --- Istio control plane ---
   - name: istiod
     namespace: istio-system
     chart: istio/istiod
@@ -44,9 +27,9 @@ releases:
     needs:
       - istio-system/istio-base
     values:
-      - values/istio/istiod.yaml
+      - infra/istio/values/istiod.yaml
 
-  # Ingress gateway
+  # --- Istio ingress gateway (ClusterIP for Kind) ---
   - name: istio-ingress
     namespace: istio-ingress
     chart: istio/gateway
@@ -54,4 +37,37 @@ releases:
     needs:
       - istio-system/istiod
     values:
-      - values/istio/ingress.yaml
+      - infra/istio/values/ingress.yaml
+
+  # --- Monitoring stack (Prometheus + Grafana) ---
+  - name: monitoring
+    namespace: monitoring
+    chart: prometheus-community/kube-prometheus-stack
+    version: 77.12.0
+    values:
+      - infra/monitoring/values.yaml
+    # If helm-diff/CRD validation bites you on first install:
+    disableValidation: true
+
+  # --- App: (NGINX + exporter) as a Helm chart under this cluster ---
+  - name: nginx
+    namespace: default
+    chart: apps/nginx
+    needs:
+      - istio-ingress/istio-ingress
+      - monitoring/monitoring
+    values:
+      - apps/nginx/values.yaml
+
+hooks:
+  # Apply raw Istio traffic manifests (gateway + VS) after components are ready
+  - events: ["postsync"]
+    showlogs: true
+    command: kubectl
+    args: ["apply", "-f", "infra/istio/traffic"]
+
+  # Apply raw prometheus rules manifests (PrometheusRule) after components are ready
+  - events: ["postsync"]
+    showlogs: true
+    command: kubectl
+    args: ["apply", "-f", "infra/monitoring/prometheus-rules"]
