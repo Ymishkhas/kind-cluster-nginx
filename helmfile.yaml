@@ -46,6 +46,8 @@ releases:
     version: 77.12.0
     values:
       - infra/monitoring/values.yaml
+    secrets: 
+      - infra/monitoring/values.secret.yaml
     # If helm-diff/CRD validation bites you on first install:
     disableValidation: true
 
@@ -64,10 +66,10 @@ hooks:
   - events: ["postsync"]
     showlogs: true
     command: kubectl
-    args: ["apply", "-f", "infra/istio/traffic"]
+    args: ["apply", "-f", "infra/istio/traffic/"]
 
   # Apply raw prometheus rules manifests (PrometheusRule) after components are ready
   - events: ["postsync"]
     showlogs: true
     command: kubectl
-    args: ["apply", "-f", "infra/monitoring/prometheus-rules"]
+    args: ["apply", "-f", "infra/monitoring/prometheus-rules/"]
