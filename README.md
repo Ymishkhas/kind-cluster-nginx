@@ -10,6 +10,7 @@ This project demonstrates how to deploy the Prometheus monitoring stack on a Kin
 - ServiceMonitor for scraping NGINX metrics
 - Grafana dashboard for live visualization
 - PrometheusRules for alerts (CPU, restarts, availability, NGINX 5xx errors)
+- SOPS encryption of secret values
 
 ## Prequisit
 
@@ -22,7 +23,7 @@ Must install
 ### Create the cluster:
 
 ```bash
-kind create cluster --name nginx-cluster --config kind/kind-config.yaml
+kind create cluster --name nginx-cluster --config kind-config.yaml
 ```
 
 Verify:
@@ -32,53 +33,42 @@ kubectl cluster-info
 kubectl get nodes
 ```
 
-### Secrets (SOPS) - Decrypt & Apply
-This repo keeps secrets **encrypted** with SOPS. You’ll need access to the Age private key.
+### Secrets (SOPS)
+This repo keeps secret values **encrypted** with SOPS. You’ll need access to the Age private key.
 
-Create the namespace (first run only):
+Set the env variable to point to the private key:
 ```bash
-kubectl create namespace monitoring
-```
-
-Apply the Grafana admin Secret:
-```bash
-sops -d secrets/grafana-admin.yaml | kubectl apply -f -
+$env:SOPS_AGE_KEY_FILE="path/to/sops-age-key.txt"
 ```
 
 ## Setup Instructions
 
-### 1. Install Prometheus Stack & Istio Ingress Gateway via helmfile
+### 1. Apply everything via Helmfile 
 
 ```bash
 helmfile -e dev apply
 ```
 
+This will apply and create:
+- Prometheus Stack 
+- Istio Ingress Gateway
+- Nginx app with exporter
+- Istio traffic manifests
+- prometheus rules manifests
+
 > **Note (first install only):** If you hit a CRD validation error from helm-diff, temporarily enable disableValidation: true on the monitoring release in helmfile.yaml. After the first successful install, comment it back out.
 
-### 2. Deploy NGINX with Exporter
+### 2. Port-forward Istio ingress (dev)
 
-```bash
-kubectl apply -f nginx/
-```
-
-### 3. Expose NGINX via Istio Ingress (Dev)
-
-Istio Ingress Gateway allow to access the NGINX service through a custom domain (yousef.localhost).
-
-Apply the Gateway and VirtualService:
-```bash
-kubectl apply -f istio/traffic/
-```
-
-For local development:
-Port-forward the Istio ingress gateway:
 ```bash
 kubectl -n istio-ingress port-forward svc/istio-ingress 80:80
 ```
 
+Istio Ingress Gateway will allow access to:
+- The NGINX service --> [yousef.localhost](yousef.localhost)
+- Grafana service --> [grafana.localhost](grafana.localhost)
+- prometheus-operated service --> [prom.localhost](prom.localhost)
 
-Visit http://yousef.localhost in your browser.
-You should see the NGINX welcome page.
 
 > For development on Kind, the Istio ingress Service type is ClusterIP.
 > In production, this would typically be a LoadBalancer fronted by DNS.
@@ -87,11 +77,7 @@ You should see the NGINX welcome page.
 
 ### 1. Verify Metrics Flow
 
-```bash
-kubectl port-forward svc/prometheus-operated -n monitoring 9090:9090
-```
-
-Open http://localhost:9090/targets → ensure nginx-exporter targets are UP.
+Open http://prom.localhost/targets → ensure nginx-exporter targets are UP.
 
 Test queries:
 `up{job="nginx-exporter"}`
@@ -100,29 +86,23 @@ Test queries:
 
 ### 2. Visualize in Grafana
 
+- URL: http://grafana.localhost
+- Credentials: from the secret (admin-user / admin-password).
+
+Run to see Decrypted values:
 ```bash
-kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80 
+sops infra/monitoring/values.secret.yaml
 ```
 
-- URL: http://localhost:3000
-- Credentials: from your grafana-admin Secret (admin-user / admin-password).
-    - If you don’t use existingSecret, the chart’s historical default was admin / prom-operator (but with existingSecret set, your Secret takes precedence).
-- Import Grafana dashboard ID 12708 (NGINX exporter(community)).
+### 3. Check Alerts
 
-### 3. Enable Alerts
-
-``` bash
-kubectl apply -f prometheus-rules/basic.rules.yaml
-```
 Check in Prometheus → Status → Rules / Alerts.
-
 
 ## Clean up
 
 ``` bash
-kubectl delete -f nginx/
-kubectl delete -f prometheus-rules/basic.rules.yaml
-helm uninstall monitoring -n monitoring
-kubectl delete namespace monitoring
+helmfile destroy
+kubectl delete -f infra/istio/traffic/ --ignore-not-found
+kubectl delete -f infra/monitoring/prometheus-rules/ --ignore-not-found
 kind delete cluster --name nginx-cluster
 ```
