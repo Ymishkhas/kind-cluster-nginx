@@ -13,6 +13,9 @@ spec:
         protocol: HTTP
       hosts:
         - yousef.localhost
+        - argocd.localhost
+        - grafana.localhost
+        - prom.localhost
 
 
 apiVersion: networking.istio.io/v1beta1
