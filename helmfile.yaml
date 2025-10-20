@@ -1,75 +1,13 @@
-helmDefaults:
-  wait: true
-  timeout: 600
-  createNamespace: true
-  atomic: true
-
 repositories:
-  - name: prometheus-community
-    url: https://prometheus-community.github.io/helm-charts
-  - name: istio
-    url: https://istio-release.storage.googleapis.com/charts
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
 
 releases:
-  # --- Istio base (CRDs) ---
-  - name: istio-base
-    namespace: istio-system
-    chart: istio/base
-    version: 1.27.1
+  - name: argocd
+    namespace: argocd
+    createNamespace: true
+    chart: argo/argo-cd
+    version: 6.7.12
+    # installed: false
     values:
-      - infra/istio/values/base.yaml
-
-  # --- Istio control plane ---
-  - name: istiod
-    namespace: istio-system
-    chart: istio/istiod
-    version: 1.27.1
-    needs:
-      - istio-system/istio-base
-    values:
-      - infra/istio/values/istiod.yaml
-
-  # --- Istio ingress gateway (ClusterIP for Kind) ---
-  - name: istio-ingress
-    namespace: istio-ingress
-    chart: istio/gateway
-    version: 1.27.1
-    needs:
-      - istio-system/istiod
-    values:
-      - infra/istio/values/ingress.yaml
-
-  # --- Monitoring stack (Prometheus + Grafana) ---
-  - name: monitoring
-    namespace: monitoring
-    chart: prometheus-community/kube-prometheus-stack
-    version: 77.12.0
-    values:
-      - infra/monitoring/values.yaml
-    secrets: 
-      - infra/monitoring/values.secret.yaml
-    # If helm-diff/CRD validation bites you on first install:
-    disableValidation: true
-
-  # --- App: (NGINX + exporter) as a Helm chart under this cluster ---
-  - name: nginx
-    namespace: default
-    chart: apps/nginx
-    needs:
-      - istio-ingress/istio-ingress
-      - monitoring/monitoring
-    values:
-      - apps/nginx/values.yaml
-
-hooks:
-  # Apply raw Istio traffic manifests (gateway + VS) after components are ready
-  - events: ["postsync"]
-    showlogs: true
-    command: kubectl
-    args: ["apply", "-f", "infra/istio/traffic/"]
-
-  # Apply raw prometheus rules manifests (PrometheusRule) after components are ready
-  - events: ["postsync"]
-    showlogs: true
-    command: kubectl
-    args: ["apply", "-f", "infra/monitoring/prometheus-rules/"]
+      - argo-values.yaml

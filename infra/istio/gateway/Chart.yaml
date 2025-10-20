@@ -1,0 +1,9 @@
+apiVersion: v2
+name: istio-gateway
+version: 1.0.0
+description: Istio Ingress Gateway (ClusterIP)
+type: application
+dependencies:
+  - name: gateway
+    version: 1.27.1
+    repository: https://istio-release.storage.googleapis.com/charts

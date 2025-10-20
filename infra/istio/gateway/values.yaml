@@ -1,0 +1,18 @@
+gateway:
+  service:
+    type: ClusterIP
+gatewayName: main-gw
+gatewayNamespace: istio-system
+infraHosts:
+  - argocd.localhost
+  - grafana.localhost
+  - prom.localhost
+argocd:
+  enabled: true
+  host: argocd.localhost
+grafana:
+  enabled: true
+  host: grafana.localhost
+prometheus:
+  enabled: true
+  host: prom.localhost

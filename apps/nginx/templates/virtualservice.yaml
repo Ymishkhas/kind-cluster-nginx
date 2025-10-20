@@ -1,0 +1,15 @@
+{{- if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nginx-vs
+spec:
+  hosts: [ {{ quote .Values.istio.host }} ]
+  gateways: [ "{{ .Values.istio.gatewayNamespace }}/{{ .Values.istio.gatewayName }}" ]
+  http:
+    - route:
+        - destination:
+            host: nginx-service.default.svc.cluster.local
+            port:
+              number: {{ .Values.service.port }}
+{{- end }}

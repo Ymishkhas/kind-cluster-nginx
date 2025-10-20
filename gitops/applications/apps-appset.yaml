@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: apps-appset
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/Ymishkhas/kind-cluster-nginx.git
+        revision: HEAD
+        directories:
+          - path: apps/*
+  template:
+    metadata:
+      name: '{{.path.basename}}'
+      annotations: { argocd.argoproj.io/sync-wave: "30" }
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/Ymishkhas/kind-cluster-nginx.git
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+        helm:
+          valueFiles:
+            - values.yaml
+            - secrets://secrets.yaml
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

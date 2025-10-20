@@ -1,0 +1,16 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana-vs
+  namespace: {{ .Values.gatewayNamespace }}
+spec:
+  hosts: [ {{ quote .Values.grafana.host }} ]
+  gateways: [ "{{ .Values.gatewayNamespace }}/{{ .Values.gatewayName }}" ]
+  http:
+    - route:
+        - destination:
+            host: monitoring-grafana.monitoring.svc.cluster.local
+            port:
+              number: 80
+{{- end }}

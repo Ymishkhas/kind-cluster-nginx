@@ -1,0 +1,16 @@
+{{- if .Values.prometheus.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: prom-vs
+  namespace: {{ .Values.gatewayNamespace }}
+spec:
+  hosts: [ {{ quote .Values.prometheus.host }} ]
+  gateways: [ "{{ .Values.gatewayNamespace }}/{{ .Values.gatewayName }}" ]
+  http:
+    - route:
+        - destination:
+            host: prometheus-operated.monitoring.svc.cluster.local
+            port:
+              number: 9090
+{{- end }}

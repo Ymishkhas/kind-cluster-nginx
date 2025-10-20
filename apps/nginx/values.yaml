@@ -11,3 +11,8 @@ resources:
 metrics:
   enabled: true
   prometheusRelease: monitoring
+istio:
+  enabled: true
+  host: yousef.localhost
+  gatewayName: main-gw
+  gatewayNamespace: istio-system

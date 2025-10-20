@@ -1,0 +1,16 @@
+{{- if .Values.argocd.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: argocd-vs
+  namespace: {{ .Values.gatewayNamespace }}
+spec:
+  hosts: [ {{ quote .Values.argocd.host }} ]
+  gateways: [ "{{ .Values.gatewayNamespace }}/{{ .Values.gatewayName }}" ]
+  http:
+    - route:
+        - destination:
+            host: argo-cd-argocd-server.argocd.svc.cluster.local
+            port: { number: 80 }
+{{- end }}
+
