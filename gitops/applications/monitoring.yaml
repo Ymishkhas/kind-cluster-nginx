@@ -23,3 +23,4 @@ spec:
     syncOptions: 
       - CreateNamespace=true
       - Validate=false # helpful on first install for CRDs
+      - ServerSideApply=true
