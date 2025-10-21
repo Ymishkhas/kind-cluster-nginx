@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.gatewayNamespace }}
 spec:
   selector:
-    istio: ingress
+    istio: {{ .Values.gateway.labels.istio }}
   servers:
     - port:
         number: 80
@@ -16,17 +16,3 @@ spec:
         - argocd.localhost
         - grafana.localhost
         - prom.localhost
-
-
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  name: {{ .Values.gatewayName }}
-  namespace: {{ .Values.gatewayNamespace }}
-spec:
-  selector:
-    istio: ingress
-  servers:
-    - port: { number: 80, name: http, protocol: HTTP }
-      hosts:
-{{ toYaml .Values.infraHosts | indent 7 }}
