@@ -1,9 +1,7 @@
 configs:
   params:
-    server.insecure: true   # Argo CD serves HTTP
-  cm:
-    # Allow helm-secrets value files like "secrets://values.secret.yaml"
-    helm.valuesFileSchemes: "file,https,http,secrets"
+    server.insecure: true
+
 server:
   service:
     type: ClusterIP
@@ -11,25 +9,3 @@ server:
 repoServer:
   service:
     type: ClusterIP
-
-  # Environment variable for Age private key
-  env:
-    - name: SOPS_AGE_KEY
-      valueFrom:
-        secretKeyRef:
-          name: sops-age
-          key: key.txt
-
-  # Init container to install helm-secrets + sops
-  initContainers:
-    - name: setup-tools
-      image: alpine:3.20
-      command: ["/bin/sh", "-c"]
-      args:
-        - |
-          apk add --no-cache curl bash git openssh \
-          && curl -L https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64 -o /usr/local/bin/sops \
-          && chmod +x /usr/local/bin/sops \
-          && curl -L https://get.helm.sh/helm-v3.14.4-linux-amd64.tar.gz | tar xz \
-          && mv linux-amd64/helm /usr/local/bin/helm \
-          && helm plugin install https://github.com/jkroepke/helm-secrets
