@@ -16,6 +16,7 @@ spec:
     helm:
       valueFiles:
         - values.yaml
+        - secrets://secrets.yaml
   syncPolicy:
     automated:
       prune: true

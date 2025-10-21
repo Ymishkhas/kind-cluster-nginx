@@ -1,4 +1,4 @@
 creation_rules:
-  # Encrypt ALL secret files named values.secret.yaml
-  - path_regex: (^|[\\/])values\.secret\.ya?ml$
-    age: 'age1g2rexr8g7pm7dxd05e0hyk55hvvj9j2u3efpf2ll0h9k96gq65jswc6ph3'
+  # Encrypt ALL secret files named secrets.yaml
+  - path_regex: (^|[\\/])secrets\.ya?ml$
+    age: 'age1kgq9e4r3fe4yjns78nwndkfwj26eazuny9ww6hlf5l9ttcn9hu3qp4nlut'
