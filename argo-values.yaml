@@ -1,6 +1,9 @@
 configs:
   params:
     server.insecure: true   # Argo CD serves HTTP
+  cm:
+    # Allow helm-secrets value files like "secrets://values.secret.yaml"
+    helm.valuesFileSchemes: "file,https,http,secrets"
 server:
   service:
     type: ClusterIP
