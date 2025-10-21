@@ -11,5 +11,5 @@ spec:
         - destination:
             host: nginx-service.nginx.svc.cluster.local
             port:
-              number: {{ .Values.service.port }}
+              number: {{ .Values.ports.http }}
 {{- end }}

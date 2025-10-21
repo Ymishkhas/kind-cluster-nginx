@@ -13,21 +13,21 @@ spec:
       for: 5m
       labels: {severity: warning}
       annotations:
-        summary: "High node CPU (>90%) on {{ $labels.instance }}"
+        summary: "High node CPU (>90%) on {{`{{ $labels.instance }}`}}"
 
     - alert: PodRestarts
       expr: increase(kube_pod_container_status_restarts_total[5m]) > 0
       for: 5m
       labels: {severity: warning}
       annotations:
-        summary: "Pod {{ $labels.pod }} restarted in last 5m"
+        summary: "Pod {{`{{ $labels.pod }}`}} restarted in last 5m"
 
     - alert: DeploymentUnavailable
       expr: kube_deployment_status_replicas_available < kube_deployment_spec_replicas
       for: 10m
       labels: {severity: critical}
       annotations:
-        summary: "Deployment {{ $labels.deployment }} unavailable"
+        summary: "Deployment {{`{{ $labels.deployment }}`}} unavailable"
 
   - name: nginx.rules
     rules:
