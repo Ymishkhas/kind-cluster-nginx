@@ -1,12 +1,12 @@
-{{- if .Values.grafana.enabled }}
+{{- if .Values.istio.grafana.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: grafana-vs
-  namespace: {{ .Values.gatewayNamespace }}
+  namespace: {{ .Values.istio.gatewayNamespace }}
 spec:
-  hosts: [ {{ quote .Values.grafana.host }} ]
-  gateways: [ "{{ .Values.gatewayNamespace }}/{{ .Values.gatewayName }}" ]
+  hosts: [ {{ quote .Values.istio.grafana.host }} ]
+  gateways: [ "{{ .Values.istio.gatewayNamespace }}/{{ .Values.istio.gatewayName }}" ]
   http:
     - route:
         - destination:

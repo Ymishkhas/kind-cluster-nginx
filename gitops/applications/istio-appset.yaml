@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: apps-appset
+  name: istio-appset
   namespace: argocd
 spec:
   goTemplate: true
@@ -11,11 +11,15 @@ spec:
         repoURL: https://github.com/Ymishkhas/kind-cluster-nginx.git
         revision: HEAD
         directories:
-          - path: apps/*
+          - path: infra/istio/*
   template:
     metadata:
       name: '{{.path.basename}}'
-      annotations: { argocd.argoproj.io/sync-wave: "30" }
+      annotations: >-
+          {{- if eq .path.basename "base" -}}10
+          {{- else if eq .path.basename "istiod" -}}12
+          {{- else if eq .path.basename "gateway" -}}14
+          {{- else -}}26{{- end -}}
     spec:
       project: default
       source:
@@ -25,10 +29,9 @@ spec:
         helm:
           valueFiles:
             - values.yaml
-            - secrets://secrets.yaml
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{.path.basename}}'
+        namespace: istio-system
       syncPolicy:
         automated:
           prune: true

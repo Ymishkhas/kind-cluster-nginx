@@ -10,3 +10,12 @@ prometheus:
     serviceMonitorSelector:
       matchLabels:
         release: monitoring
+istio:
+  gatewayName: main-gw
+  gatewayNamespace: istio-system
+  grafana:
+    enabled: true
+    host: grafana.localhost
+  prometheus:
+    enabled: true
+    host: prom.localhost

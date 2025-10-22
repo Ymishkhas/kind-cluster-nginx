@@ -1,21 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: istiod
+  name: monitoring
   namespace: argocd
-  annotations: { argocd.argoproj.io/sync-wave: "22" }
+  annotations: { argocd.argoproj.io/sync-wave: "20" }
 spec:
   project: default
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-system
+    namespace: monitoring
   source:
     repoURL: https://github.com/Ymishkhas/kind-cluster-nginx.git
     targetRevision: HEAD
-    path: infra/istio/istiod
+    path: infra/monitoring
+    helm:
+      valueFiles:
+        - values.yaml
+        # - secrets://secrets.yaml
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions: 
       - CreateNamespace=true
+      - Validate=false # helpful on first install for CRDs
+      - ServerSideApply=true

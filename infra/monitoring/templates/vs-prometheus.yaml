@@ -1,12 +1,12 @@
-{{- if .Values.prometheus.enabled }}
+{{- if .Values.istio.prometheus.enabled }}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: prom-vs
-  namespace: {{ .Values.gatewayNamespace }}
+  namespace: {{ .Values.istio.gatewayNamespace }}
 spec:
-  hosts: [ {{ quote .Values.prometheus.host }} ]
-  gateways: [ "{{ .Values.gatewayNamespace }}/{{ .Values.gatewayName }}" ]
+  hosts: [ {{ quote .Values.istio.prometheus.host }} ]
+  gateways: [ "{{ .Values.istio.gatewayNamespace }}/{{ .Values.istio.gatewayName }}" ]
   http:
     - route:
         - destination:

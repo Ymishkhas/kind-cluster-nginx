@@ -24,9 +24,3 @@ infraHosts:
 argocd:
   enabled: true
   host: argocd.localhost
-grafana:
-  enabled: true
-  host: grafana.localhost
-prometheus:
-  enabled: true
-  host: prom.localhost
