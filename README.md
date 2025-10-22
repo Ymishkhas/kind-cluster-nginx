@@ -65,10 +65,15 @@ Apply argocd root app
 kubectl apply -f gitops/root-app.yaml
 ```
 
+After reaching the UI the first time you can login with username: admin and the random password generated during the installation. You can find the password by running:
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+```
+
 ### 2. Port-forward Istio ingress (dev)
 
 ```bash
-kubectl -n istio-ingress port-forward svc/istio-ingress 80:80
+kubectl -n istio-system port-forward svc/istio-gateway 80:80
 ```
 
 Istio Ingress Gateway will allow access to:
