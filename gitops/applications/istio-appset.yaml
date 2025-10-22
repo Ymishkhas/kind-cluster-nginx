@@ -15,10 +15,11 @@ spec:
   template:
     metadata:
       name: '{{.path.basename}}'
-      annotations: >-
-          {{- if eq .path.basename "base" -}}10
-          {{- else if eq .path.basename "istiod" -}}12
-          {{- else if eq .path.basename "gateway" -}}14
+      annotations:
+        argocd.argoproj.io/sync-wave: >-
+          {{- if eq .path.basename "base" -}}20
+          {{- else if eq .path.basename "istiod" -}}22
+          {{- else if eq .path.basename "gateway" -}}24
           {{- else -}}26{{- end -}}
     spec:
       project: default
