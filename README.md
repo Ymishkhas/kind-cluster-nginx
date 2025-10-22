@@ -11,6 +11,7 @@ This project demonstrates how to deploy the Prometheus monitoring stack on a Kin
 - Grafana dashboard for live visualization
 - PrometheusRules for alerts (CPU, restarts, availability, NGINX 5xx errors)
 - SOPS encryption of secret values
+- Argo CD GitOps workflow
 
 ## Prequisit
 
@@ -38,25 +39,31 @@ This repo keeps secret values **encrypted** with SOPS. You’ll need access to t
 
 Set the env variable to point to the private key:
 ```bash
-$env:SOPS_AGE_KEY_FILE="path/to/sops-age-key.txt"
+$env:SOPS_AGE_KEY_FILE="path/to/key.txt"
+```
+
+Create the kubernetes secret holding the exported private key for ArgoCD to access
+```bash
+kubectl create namespace argocd
+kubectl -n argocd create secret generic helm-secrets-private-keys --from-file=key.txt=path/to/key.txt
 ```
 
 ## Setup Instructions
 
-### 1. Apply everything via Helmfile 
+### 1. Apply argocd via Helmfile 
 
 ```bash
 helmfile apply
 ```
 
 This will apply and create:
-- Prometheus Stack 
-- Istio Ingress Gateway
-- Nginx app with exporter
-- Istio traffic manifests
-- prometheus rules manifests
+- ArgoCD
+- Configure helm-secrets with age for ArgoCD
 
-> **Note (first install only):** If you hit a CRD validation error from helm-diff, temporarily enable disableValidation: true on the monitoring release in helmfile.yaml. After the first successful install, comment it back out.
+Apply argocd root app
+```bash
+kubectl apply -f gitops/root-app.yaml
+```
 
 ### 2. Port-forward Istio ingress (dev)
 
@@ -65,13 +72,11 @@ kubectl -n istio-ingress port-forward svc/istio-ingress 80:80
 ```
 
 Istio Ingress Gateway will allow access to:
+- ArgoCD UI --> [argocd.localhost](argocd.localhost)
 - The NGINX service --> [yousef.localhost](yousef.localhost)
 - Grafana service --> [grafana.localhost](grafana.localhost)
 - prometheus-operated service --> [prom.localhost](prom.localhost)
 
-
-> For development on Kind, the Istio ingress Service type is ClusterIP.
-> In production, this would typically be a LoadBalancer fronted by DNS.
 
 ## Monitoring
 
@@ -91,7 +96,7 @@ Test queries:
 
 Run to see Decrypted values:
 ```bash
-sops infra/monitoring/values.secret.yaml
+sops infra/monitoring/secrets.yaml
 ```
 
 ### 3. Check Alerts
@@ -102,7 +107,5 @@ Check in Prometheus → Status → Rules / Alerts.
 
 ``` bash
 helmfile destroy
-kubectl delete -f infra/istio/traffic/ --ignore-not-found
-kubectl delete -f infra/monitoring/prometheus-rules/ --ignore-not-found
 kind delete cluster --name nginx-cluster
 ```
