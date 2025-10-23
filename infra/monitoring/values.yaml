@@ -1,15 +1,16 @@
-prometheus:
-  prometheusSpec:
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 10Gi
-    serviceMonitorSelector:
-      matchLabels:
-        release: monitoring
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+      serviceMonitorSelector:
+        matchLabels:
+          release: monitoring
 istio:
   gatewayName: main-gw
   gatewayNamespace: istio-system
@@ -19,6 +20,3 @@ istio:
   prometheus:
     enabled: true
     host: prom.localhost
-grafana:
-    adminUser: admin
-    adminPassword: admin123
