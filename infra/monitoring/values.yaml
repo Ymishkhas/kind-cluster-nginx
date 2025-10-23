@@ -19,3 +19,6 @@ istio:
   prometheus:
     enabled: true
     host: prom.localhost
+grafana:
+    adminUser: admin
+    adminPassword: admin123
