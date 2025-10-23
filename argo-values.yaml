@@ -17,7 +17,6 @@ repoServer:
     type: ClusterIP
 
   ## See https://github.com/jkroepke/helm-secrets/wiki/ArgoCD-Integration#option-2-init-container
-  repoServer:
   env:
     - name: HELM_PLUGINS
       value: /gitops-tools/helm-plugins/
