@@ -2,3 +2,9 @@ apiVersion: v2
 name: nginx
 version: 0.1.0
 type: application
+dependencies:
+- repository: "oci://registry-1.docker.io/bitnamicharts"
+  version: 18.1.8
+  name: postgresql
+  alias: preview-postgres
+  condition: preview.database.enabled

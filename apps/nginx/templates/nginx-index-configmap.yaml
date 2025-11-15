@@ -1,0 +1,60 @@
+{{- if .Values.preview.database.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-index-html
+  labels:
+    app: nginx
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Nginx + PostgreSQL Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 50px;
+                background: #f0f0f0;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .success { color: #28a745; }
+            .info { 
+                background: #e7f3ff;
+                padding: 15px;
+                border-left: 4px solid #2196F3;
+                margin: 20px 0;
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="success">✓ PostgreSQL Connection Test</h1>
+            <p>This page is served by Nginx with PostgreSQL connection configured.</p>
+            
+            <div class="info">
+                <h3>Database Connection String:</h3>
+                <p id="db-url">Loading...</p>
+            </div>
+            
+            <div class="info">
+                <h3>Environment Check:</h3>
+                <p>If you see a PostgreSQL URL above, the secret injection worked!</p>
+            </div>
+        </div>
+        
+        <script>
+            // In a real app, DATABASE_URL would be server-side
+            // For this test, we'll use a placeholder
+            document.getElementById('db-url').textContent = 
+                'DATABASE_URL is available as env var (check container logs to verify)';
+        </script>
+    </body>
+    </html>
+{{- end }}

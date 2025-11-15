@@ -7,7 +7,7 @@ ports:
   metrics: 9113
 resources:
   requests: { cpu: "50m", memory: "64Mi" }
-  limits:   { cpu: "200m", memory: "128Mi" }
+  limits: { cpu: "200m", memory: "128Mi" }
 metrics:
   enabled: true
   prometheusRelease: monitoring
@@ -16,3 +16,61 @@ istio:
   host: yousef.localhost
   gatewayName: main-gw
   gatewayNamespace: istio-system
+
+preview:
+  database:
+    enabled: true # changed to true by GitHub Actions
+    # url: postgresql://[username]:[password]@[host]:[port]/[database]
+    # url: postgresql://[username]:[password]@[{{ .Release.Name }}-{chart alias}]:[port]/[database]
+    # url: postgresql://preview:preview@feature-preview-db-poc-preview-postgres:5432/preview
+
+postgresql:
+  global:
+    postgresql:
+      auth:
+        postgresPassword: "preview"
+        username: "preview"
+        password: "preview"
+        database: "preview"
+        existingSecret: ""
+        secretKeys:
+          adminPasswordKey: ""
+          userPasswordKey: ""
+          replicationPasswordKey: ""
+
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+    #   storageClass: gp3
+
+    # resources:
+    #   requests:
+    #     cpu: 100m
+    #     memory: 256Mi
+    #   limits:
+    #     cpu: 500m
+    #     memory: 512Mi
+
+    # snapshot restore?
+    # initdb:
+    #   scripts:
+    #     restore.sh: |
+    #       #!/bin/bash
+    #       # aws s3 cp s3://snapshots/dev.sql.gz - | gunzip | psql
+
+    # affinity:
+    #   nodeAffinity:
+    #     requiredDuringSchedulingIgnoredDuringExecution:
+    #       nodeSelectorTerms:
+    #       - matchExpressions:
+    #         - key: role
+    #           operator: In
+    #           values:
+    #           - generic
+
+    # Disable
+  metrics:
+    enabled: false
+  readReplicas:
+    replicaCount: 0
