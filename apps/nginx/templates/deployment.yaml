@@ -19,12 +19,12 @@ spec:
           - -c
           - |
             echo "Waiting for PostgreSQL to be ready..."
-            until pg_isready -h {{ .Release.Name }}-preview-postgres -p 5432 -U {{ .Values.preview-postgres.auth.username }}; do
+            until pg_isready -h {{ .Release.Name }}-postgresql -p 5432 -U {{ .Values.postgresql.auth.username }}; do
               echo "PostgreSQL is unavailable - sleeping"
               sleep 2
             done
             echo "PostgreSQL is up - testing connection..."
-            PGPASSWORD={{ .Values.preview-postgres.auth.password }} psql -h {{ .Release.Name }}-preview-postgres -U {{ .Values.preview-postgres.auth.username }} -d {{ .Values.preview-postgres.auth.database }} -c "SELECT 1;"
+            PGPASSWORD={{ .Values.postgresql.auth.password }} psql -h {{ .Release.Name }}-postgresql -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }} -c "SELECT 1;"
             echo "✓ Connection successful!"
       {{- end }}
       

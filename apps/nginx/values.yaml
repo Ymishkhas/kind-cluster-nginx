@@ -22,7 +22,7 @@ preview:
     enabled: true # changed to true by GitHub Actions
     # url: postgresql://[username]:[password]@[host]:[port]/[database]
     # url: postgresql://[username]:[password]@[{{ .Release.Name }}-{chart alias}]:[port]/[database]
-    # url: postgresql://preview:preview@feature-preview-db-poc-preview-postgres:5432/preview
+    # url: postgresql://preview:preview@feature-preview-db-poc-postgresql:5432/preview
 
 postgresql:
   global:
