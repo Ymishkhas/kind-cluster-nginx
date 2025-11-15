@@ -25,18 +25,11 @@ preview:
     # url: postgresql://preview:preview@feature-preview-db-poc-postgresql:5432/preview
 
 postgresql:
-  global:
-    postgresql:
-      auth:
-        postgresPassword: "preview"
-        username: "preview"
-        password: "preview"
-        database: "preview"
-        existingSecret: ""
-        secretKeys:
-          adminPasswordKey: ""
-          userPasswordKey: ""
-          replicationPasswordKey: ""
+  auth:
+    postgresPassword: "preview"
+    username: "preview"
+    password: "preview"
+    database: "preview"
 
   primary:
     persistence:

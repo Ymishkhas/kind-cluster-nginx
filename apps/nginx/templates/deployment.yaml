@@ -10,21 +10,27 @@ spec:
     metadata: { labels: { app: nginx } }
     spec:
       {{- if .Values.preview.database.enabled }}
-      # Init container waits for postgres to be ready
       initContainers:
       - name: wait-for-postgres
-        image: postgres:18-alpine
+        image: postgres:16-alpine
         command:
           - sh
           - -c
           - |
             echo "Waiting for PostgreSQL to be ready..."
-            until pg_isready -h {{ .Release.Name }}-postgresql -p 5432 -U {{ .Values.postgresql.auth.username }}; do
+            PG_HOST="{{ .Release.Name }}-postgresql"
+            PG_PORT="5432"
+            PG_USER="{{ .Values.postgresql.auth.username }}"
+            PG_DB="{{ .Values.postgresql.auth.database }}"
+            
+            echo "Connecting to: $PG_HOST:$PG_PORT as $PG_USER to database $PG_DB"
+            
+            until pg_isready -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER"; do
               echo "PostgreSQL is unavailable - sleeping"
               sleep 2
             done
             echo "PostgreSQL is up - testing connection..."
-            PGPASSWORD={{ .Values.postgresql.auth.password }} psql -h {{ .Release.Name }}-postgresql -U {{ .Values.postgresql.auth.username }} -d {{ .Values.postgresql.auth.database }} -c "SELECT 1;"
+            PGPASSWORD="{{ .Values.postgresql.auth.password }}" psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_DB" -c "SELECT version();"
             echo "✓ Connection successful!"
       {{- end }}
       
