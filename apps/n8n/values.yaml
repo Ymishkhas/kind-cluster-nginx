@@ -1,0 +1,261 @@
+# n8n/values.yaml
+# check: https://github.com/8gears/n8n-helm-chart/blob/main/charts/n8n/values.yaml
+n8n:
+  # Global configuration
+  image:
+    repository: n8nio/n8n
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  # Ingress - disabled (using Istio VirtualService)
+  ingress:
+    enabled: false
+
+  # Main n8n Application Configuration
+  main:
+    config:
+      n8n:
+        # license:
+        #   activation:
+        #     key: jampo
+        protocol: https
+        host: n8n.ymishkhas.cloud
+        port: 443
+        webhook_url: https://n8n.ymishkhas.cloud
+        log:
+          level: info
+
+        # Prometheus metrics
+        metrics: true
+        # SMTP Email Configuration for invitations
+        # email:
+        #   mode: smtp
+        #   smtp:
+        #     host: smtp.gmail.com # e.g., smtp.gmail.com, smtp.sendgrid.net
+        #     port: 587 # 587 for TLS, 465 for SSL
+        #     secure: false # true for SSL (port 465), false for TLS (port 587)
+        #     sender: noreply@ymishkhas.cloud # From email address
+        # user and password are in secrets.yaml
+
+        # Google OAuth - uncomment and configure in secrets.yaml when needed
+        # auth:
+        #   google:
+        #     client_id: <from secrets>
+        #     client_secret: <from secrets>
+        #     callback_url: https://n8n.ymishkhas.cloud/rest/oauth2-credential/callback
+        #     allowed_domains: techrar.com
+
+        # db:
+        #   type: postgresdb  # Use this for PostgreSQL (external RDS)
+        # SQLite (default) - for development/testing
+        # For external database (production), uncomment and configure:
+        # postgresdb:
+        #   host: <RDS endpoint>
+        #   port: 5432
+        #   database: n8n
+        #   user: n8n
+        #   password: <from secrets>      # For queue mode (when using workers):
+        # executions:
+        #   mode: queue
+        # queue:
+        #   bull:
+        #     redis:
+        #       host: n8n-valkey-master
+        #       port: 6379
+
+    secret: {}
+      # Secrets are defined in secrets.yaml
+      # n8n:
+      #   encryption_key: <Generate with: openssl rand -base64 42>
+      #   email:
+      #     smtp:
+      #       user: <smtp-username>
+      #       password: <smtp-password>
+      #   auth:
+      #     google:
+      #       client_id: <from Google Console>
+      #       client_secret: <from Google Console>
+      # db:
+      #   postgresdb:
+      #     password: <db password>
+      # queue:
+      #   bull:
+      #     redis:
+      #       password: <redis password>
+
+    extraEnv: {}
+
+    replicaCount: 1
+
+    deploymentStrategy:
+      type: "Recreate"
+
+    serviceAccount:
+      create: true
+      annotations: {}
+
+    persistence:
+      enabled: true
+      type: dynamic
+      storageClass: "gp3"
+      accessModes:
+      - ReadWriteOnce
+      size: 10Gi
+
+    # Pod labels for Prometheus, monitoring, etc.
+    podLabels:
+      app: n8n
+      team: devops
+      monitoring: enabled
+
+    # Tolerations for tainted nodes
+    tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+
+    affinity: {}
+    nodeSelector: {}
+
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    securityContext: {}
+
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+
+    service:
+      enabled: true
+      type: ClusterIP
+      port: 80
+    # resources:
+    #   requests:
+    #     cpu: 500m
+    #     memory: 512Mi
+    #   limits:
+    #     cpu: 1000m
+    #     memory: 1Gi
+
+    # Workers (enable later when you need scaling)
+    #
+    # worker:
+    #   enabled: false
+    #   replicaCount: 3
+    #   concurrency: 10
+    #   
+    #   persistence:
+    #     enabled: true
+    #     type: dynamic
+    #     storageClass: "gp3"
+    #     size: 5Gi
+    #   
+    #   podLabels:
+    #     app: n8n-worker
+    #     monitoring: enabled
+    #   
+    #   tolerations:
+    #     - key: "workload"
+    #       operator: "Equal"
+    #       value: "applications"
+    #       effect: "NoSchedule"
+    #   
+    #   resources:
+    #     requests:
+    #       cpu: 500m
+    #       memory: 1Gi
+    #     limits:
+    #       cpu: 2000m
+    #       memory: 2Gi
+    #   
+    #   autoscaling:
+    #     enabled: true
+    #     minReplicas: 2
+    #     maxReplicas: 10
+    #     targetCPUUtilizationPercentage: 70
+
+    #
+    # Redis/Valkey (enable when you enable workers)
+    #
+    # valkey:
+    #   enabled: false
+    #   architecture: standalone
+    #   auth:
+    #     enabled: true
+    #     # password: <set in secrets.yaml>
+    #   primary:
+    #     persistence:
+    #       enabled: true
+    #       size: 5Gi
+    #       storageClass: gp3
+
+    # Database Configuration
+    # By default, n8n uses SQLite (stored in the persistent volume)
+    # For production: use external PostgreSQL (RDS)
+    # To use external DB:
+    # 1. Uncomment db.type: postgresdb in main.config above
+    # 2. Uncomment db.postgresdb settings in main.config above
+    # 3. Set password in secrets.yaml under main.secret.db.postgresdb.password
+
+    # Used in extras.yaml
+    # extraManifests: []
+
+  extraManifests:
+  # VirtualService for Istio
+  - apiVersion: networking.istio.io/v1
+    kind: VirtualService
+    metadata:
+      name: n8n
+      namespace: tools
+    spec:
+      gateways:
+      - istio-system/main-gw
+      hosts:
+      - n8n.localhost
+      http:
+      - match:
+        - uri:
+            prefix: /
+        route:
+        - destination:
+            host: n8n.tools.svc.cluster.local # service-name.namespace.svc.cluster.local
+            port:
+              number: 80
+
+  # ServiceMonitor for Prometheus
+  - apiVersion: monitoring.coreos.com/v1
+    kind: ServiceMonitor
+    metadata:
+      name: n8n-metrics
+      namespace: tools
+      labels:
+        release: monitoring
+    spec:
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: n8n
+          app.kubernetes.io/component: main
+      endpoints:
+      - port: http
+        path: /metrics
+        interval: 30s
+        scrapeTimeout: 10s
