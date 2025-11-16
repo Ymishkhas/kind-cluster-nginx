@@ -16,3 +16,4 @@ spec:
         - argocd.localhost
         - grafana.localhost
         - prom.localhost
+        - n8n.localhost

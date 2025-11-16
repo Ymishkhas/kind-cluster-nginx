@@ -18,15 +18,17 @@ n8n:
         # license:
         #   activation:
         #     key: jampo
-        protocol: https
-        host: n8n.ymishkhas.cloud
-        port: 443
-        webhook_url: https://n8n.ymishkhas.cloud
+        protocol: http
+        host: n8n.localhost
+        # Internal port must match what the container binds to (5678)
+        port: 5678
+        # Webhook URL for external access (no port means :80 for http)
+        webhook_url: http://n8n.localhost
         log:
           level: info
 
         # Prometheus metrics
-        metrics: true
+        metrics: false
         # SMTP Email Configuration for invitations
         # email:
         #   mode: smtp
@@ -64,26 +66,34 @@ n8n:
         #       port: 6379
 
     secret: {}
-      # Secrets are defined in secrets.yaml
-      # n8n:
-      #   encryption_key: <Generate with: openssl rand -base64 42>
-      #   email:
-      #     smtp:
-      #       user: <smtp-username>
-      #       password: <smtp-password>
-      #   auth:
-      #     google:
-      #       client_id: <from Google Console>
-      #       client_secret: <from Google Console>
-      # db:
-      #   postgresdb:
-      #     password: <db password>
-      # queue:
-      #   bull:
-      #     redis:
-      #       password: <redis password>
+    # Secrets are defined in secrets.yaml
+    # n8n:
+    #   encryption_key: <Generate with: openssl rand -base64 42>
+    #   email:
+    #     smtp:
+    #       user: <smtp-username>
+    #       password: <smtp-password>
+    #   auth:
+    #     google:
+    #       client_id: <from Google Console>
+    #       client_secret: <from Google Console>
+    # db:
+    #   postgresdb:
+    #     password: <db password>
+    # queue:
+    #   bull:
+    #     redis:
+    #       password: <redis password>
 
-    extraEnv: {}
+    extraEnv:
+      # Disable secure cookie since we're using http:// (not https://)
+      N8N_SECURE_COOKIE:
+        value: "false"
+      # Force the webhook/editor URL to not include :5678 port
+      WEBHOOK_URL:
+        value: "http://n8n.localhost"
+      N8N_EDITOR_BASE_URL:
+        value: "http://n8n.localhost"
 
     replicaCount: 1
 
@@ -96,11 +106,7 @@ n8n:
 
     persistence:
       enabled: true
-      type: dynamic
-      storageClass: "gp3"
-      accessModes:
-      - ReadWriteOnce
-      size: 10Gi
+      size: 1Gi
 
     # Pod labels for Prometheus, monitoring, etc.
     podLabels:
@@ -225,7 +231,7 @@ n8n:
     kind: VirtualService
     metadata:
       name: n8n
-      namespace: tools
+      namespace: n8n
     spec:
       gateways:
       - istio-system/main-gw
@@ -237,25 +243,24 @@ n8n:
             prefix: /
         route:
         - destination:
-            host: n8n.tools.svc.cluster.local # service-name.namespace.svc.cluster.local
+            host: n8n.n8n.svc.cluster.local # service-name.namespace.svc.cluster.local
             port:
               number: 80
-
   # ServiceMonitor for Prometheus
-  - apiVersion: monitoring.coreos.com/v1
-    kind: ServiceMonitor
-    metadata:
-      name: n8n-metrics
-      namespace: tools
-      labels:
-        release: monitoring
-    spec:
-      selector:
-        matchLabels:
-          app.kubernetes.io/name: n8n
-          app.kubernetes.io/component: main
-      endpoints:
-      - port: http
-        path: /metrics
-        interval: 30s
-        scrapeTimeout: 10s
+  # - apiVersion: monitoring.coreos.com/v1
+  #   kind: ServiceMonitor
+  #   metadata:
+  #     name: n8n-metrics
+  #     namespace: tools
+  #     labels:
+  #       release: monitoring
+  #   spec:
+  #     selector:
+  #       matchLabels:
+  #         app.kubernetes.io/name: n8n
+  #         app.kubernetes.io/component: main
+  #     endpoints:
+  #     - port: http
+  #       path: /metrics
+  #       interval: 30s
+  #       scrapeTimeout: 10s
