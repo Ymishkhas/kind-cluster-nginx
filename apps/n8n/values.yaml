@@ -104,6 +104,10 @@ n8n:
         value: "http://n8n.localhost"
       EXECUTIONS_MODE:
         value: "queue"
+      N8N_RUNNERS_ENABLED:
+        value: "true"
+      N8N_TEMPLATES_ENABLED:
+        value: "true"
     persistence:
       # If true, use a Persistent Volume Claim, If false, use emptyDir
       enabled: false
@@ -730,7 +734,7 @@ n8n:
   #    stringData:
   #      image_name: {{ .Values.image.repository }}
 
-  # Bitnami Valkey configuration (Redis-compatible)
+  # Bitnami Valkey configuration
   # https://artifacthub.io/packages/helm/bitnami/valkey
   valkey:
     enabled: true
@@ -738,7 +742,7 @@ n8n:
     image:
       registry: docker.io
       repository: bitnami/valkey
-      tag: "8.0-debian-12"  # Use major version tag which is stable
+      tag: "latest"  # Use latest stable version
     auth:
       enabled: false
     
