@@ -734,15 +734,16 @@ n8n:
   #    stringData:
   #      image_name: {{ .Values.image.repository }}
 
-  # Bitnami Valkey configuration
-  # https://artifacthub.io/packages/helm/bitnami/valkey
+  # Bitnami Redis configuration (use Redis instead of Valkey for stability)
+  # https://artifacthub.io/packages/helm/bitnami/redis
+  # Note: The n8n chart expects "valkey:" key but we override the image to use Redis
   valkey:
     enabled: true
     architecture: standalone
     image:
       registry: docker.io
-      repository: bitnami/valkey
-      tag: "latest"  # Use latest stable version
+      repository: bitnami/redis
+      tag: "7.4-debian-12"
     auth:
       enabled: false
     
