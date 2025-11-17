@@ -67,7 +67,7 @@ n8n:
       queue:
         bull:
           redis:
-            host: n8n-valkey-master  # or n8n-redis-master if using redis
+            host: n8n-redis-master
             port: 6379
             db: 0
 
@@ -303,7 +303,7 @@ n8n:
       queue:
         bull:
           redis:
-            host: n8n-valkey-master
+            host: n8n-redis-master
             port: 6379
             db: 0
 
@@ -730,18 +730,17 @@ n8n:
   #    stringData:
   #      image_name: {{ .Values.image.repository }}
 
-  # Bitnami Valkey configuration
-  # https://artifacthub.io/packages/helm/bitnami/valkey
-  valkey:
+  # Bitnami Redis configuration
+  # https://artifacthub.io/packages/helm/bitnami/redis
+  redis:
     enabled: true
     architecture: standalone
-    image:
-      tag: "8.0.1-debian-12-r0"  # Use a stable version that exists
+    auth:
+      enabled: false  # Disable auth for simplicity
     
-    primary:
+    master:
       persistence:
         enabled: false
-        existingClaim: ""
         size: 2Gi
 
 
