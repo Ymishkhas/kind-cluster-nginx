@@ -50,7 +50,7 @@ n8n:
   # The config: {} dictionary is converted to environmental variables in the ConfigMap.
   main:
     # See https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
-    # config: {}
+    config: {}
     #    n8n:
     #     license:
     #       activation:
@@ -61,15 +61,15 @@ n8n:
     #      type: postgresdb
     #      postgresdb:
     #        host: 192.168.0.52
-    config:
-      executions:
-        mode: queue
-      queue:
-        bull:
-          redis:
-            host: n8n-valkey-master
-            port: 6379
-            db: 0
+    # config:
+    #   executions:
+    #     mode: queue
+    #   queue:
+    #     bull:
+    #       redis:
+    #         host: n8n-valkey-master
+    #         port: 6379
+    #         db: 0
 
     # Dictionary for secrets, unlike config:, the values here will end up in the secret file.
     # The YAML entry db.postgresdb.password: my_secret is transformed DB_POSTGRESDB_password=bXlfc2VjcmV0
@@ -102,10 +102,10 @@ n8n:
         value: "http://n8n.localhost"
       N8N_EDITOR_BASE_URL:
         value: "http://n8n.localhost"
-      EXECUTIONS_MODE:
-        value: "queue"
-      N8N_RUNNERS_ENABLED:
-        value: "true"
+      # EXECUTIONS_MODE:
+      #   value: "queue"
+      # N8N_RUNNERS_ENABLED:
+      #   value: "true"
       N8N_TEMPLATES_ENABLED:
         value: "true"
     persistence:
@@ -299,17 +299,17 @@ n8n:
   # Worker related settings
   #
   worker:
-    enabled: true
+    enabled: false
 
     # additional (to main) config for worker
-    # config: {}
-    config:
-      queue:
-        bull:
-          redis:
-            host: n8n-valkey-master
-            port: 6379
-            db: 0
+    config: {}
+    # config:
+    #   queue:
+    #     bull:
+    #       redis:
+    #         host: n8n-valkey-master
+    #         port: 6379
+    #         db: 0
 
     # additional (to main) config for worker
     secret: {}
@@ -737,22 +737,22 @@ n8n:
   # Bitnami Valkey configuration
   # https://artifacthub.io/packages/helm/bitnami/valkey
   valkey:
-    enabled: true
-    architecture: standalone
-    image:
-      registry: docker.io
-      repository: bitnami/valkey
-      tag: "8.0.1-debian-12-r0"
-    auth:
-      enabled: false
-    global:
-      security:
-        allowInsecureImages: true
+    enabled: false
+    # architecture: standalone
+    # image:
+    #   registry: docker.io
+    #   repository: bitnami/valkey
+    #   tag: "8.0.1-debian-12-r0"
+    # auth:
+    #   enabled: false
+    # global:
+    #   security:
+    #     allowInsecureImages: true
     
-    primary:
-      persistence:
-        enabled: false
-        size: 2Gi
+    # primary:
+    #   persistence:
+    #     enabled: false
+    #     size: 2Gi
 
 
     # ServiceMonitor for Prometheus
