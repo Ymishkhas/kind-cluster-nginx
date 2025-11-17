@@ -4,6 +4,9 @@ type: application
 version: 1.0.0
 dependencies:
   - repository: oci://8gears.container-registry.com/library
-    name: n8n
     version: 1.1.0
+    name: n8n
     alias: n8n
+  # - repository: oci://registry-1.docker.io/bitnamicharts
+  #   version: 5.0.8
+  #   name: valkey
