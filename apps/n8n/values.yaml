@@ -734,17 +734,20 @@ n8n:
   #    stringData:
   #      image_name: {{ .Values.image.repository }}
 
-  # Bitnami Valkey configuration from OCI registry
+  # Bitnami Valkey configuration
   # https://artifacthub.io/packages/helm/bitnami/valkey
   valkey:
     enabled: true
     architecture: standalone
     image:
-      registry: registry-1.docker.io
-      repository: bitnamicharts/valkey
-      tag: "latest"
+      registry: docker.io
+      repository: bitnami/valkey
+      tag: "8.0.1-debian-12-r0"
     auth:
       enabled: false
+    global:
+      security:
+        allowInsecureImages: true
     
     primary:
       persistence:
