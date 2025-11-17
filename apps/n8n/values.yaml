@@ -735,6 +735,8 @@ n8n:
   valkey:
     enabled: true
     architecture: standalone
+    image:
+      tag: "8.0.1-debian-12-r0"  # Use a stable version that exists
     
     primary:
       persistence:
