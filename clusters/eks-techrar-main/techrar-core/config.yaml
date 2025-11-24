@@ -1,0 +1,8 @@
+app:
+  name: techrar-core
+  releaseName: techrar
+  namespace: techrar
+  project: core
+  values: values.yaml
+  extraValues: ../dummy.yaml
+  secrets: secrets.yaml
