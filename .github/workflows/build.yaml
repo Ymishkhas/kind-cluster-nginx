@@ -58,4 +58,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           commitUserName: Mi CI
           commitUserEmail: Mi.ci@users.noreply.github.com
-          workDir: infrastructure
+          # workDir: infrastructure
