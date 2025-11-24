@@ -1,0 +1,61 @@
+name: Build & Deploy Test
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+#   cancel-in-progress: true
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+env:
+  ECR_REPO: random/techrar/core
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: 🐳 Build
+    steps:
+      - uses: actions/checkout@v4
+    outputs:
+      image-uri: 'dev-123456789'
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    name: 🚀 Deploy
+    if: github.ref_name == 'main' || github.ref_name == 'dev'
+    env:
+      ECR_IMAGE_TAG: ${{ needs.build.outputs.image-uri }}
+      GITOPS_REPO: ymishkhas/kind-cluster-nginx
+    steps:
+      - name: Checkout Target Repository
+        uses: actions/checkout@v4
+
+      - name: Update values.yaml (all core apps)
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          repository: ${{ github.repository }}
+          description: "deploying changes on repository *core* branch *main* image tag: *${{ env.ECR_IMAGE_TAG }}*"
+          changes: |
+            {
+              "clusters/eks-techrar-${{ github.ref_name }}/apps/techrar-core/values.yaml": {
+                "techrar.apps.core.image": "${{ env.ECR_REPO }}:${{ env.ECR_IMAGE_TAG }}"
+              },
+              "clusters/eks-techrar-${{ github.ref_name }}/apps/techrar-core-queue/values.yaml": {
+                "techrar.apps[\"core-queue\"].image": "${{ env.ECR_REPO }}:${{ env.ECR_IMAGE_TAG }}"
+              },
+              "clusters/eks-techrar-${{ github.ref_name }}/apps/techrar-core-cron/values.yaml": {
+                "techrar.apps[\"core-cron\"].image": "${{ env.ECR_REPO }}:${{ env.ECR_IMAGE_TAG }}"
+              },
+              "clusters/eks-techrar-${{ github.ref_name }}/apps/techrar-core-gui/values.yaml": {
+                "techrar.apps[\"core-gui\"].image": "${{ env.ECR_REPO }}:${{ env.ECR_IMAGE_TAG }}"
+              }
+            }
+          branch: main
+          targetBranch: main
+          commitChange: true
+          message: "[bot] *core* deploy image tag: *${{ env.ECR_IMAGE_TAG }}*"
+          masterBranchName: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commitUserName: Mi CI
+          commitUserEmail: Mi.ci@users.noreply.github.com
+          workDir: infrastructure

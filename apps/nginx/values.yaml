@@ -19,10 +19,14 @@ istio:
 
 preview:
   database:
-    enabled: false # changed to true by GitHub Actions
+    enabled: true # changed to true by GitHub Actions
     # url: postgresql://[username]:[password]@[host]:[port]/[database]
     # url: postgresql://[username]:[password]@[{{ .Release.Name }}-{chart alias}]:[port]/[database]
     # url: postgresql://preview:preview@feature-preview-db-poc-postgresql:5432/preview
+  redis:
+    enabled: true
+    # url: redis://[host]:[port]
+    # url: redis://<release-name>-redis-master:6379
 
 postgresql:
   auth:
@@ -66,4 +70,13 @@ postgresql:
   metrics:
     enabled: false
   readReplicas:
+    replicaCount: 0
+
+redis:
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+  replica:
     replicaCount: 0
