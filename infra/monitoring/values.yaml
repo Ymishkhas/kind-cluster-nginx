@@ -12,6 +12,36 @@ kube-prometheus-stack:
         matchLabels:
           release: monitoring
 
+  grafana:
+    # Use grafana.ini style configuration via values.yaml
+    grafana.ini:
+      users:
+        # allow users to create accounts (Sign Up button on the login page)
+        allow_sign_up: true
+        # automatically assign the new user to the default org
+        auto_assign_org: true
+        # default role assigned to newly created users (Admin, Editor, Viewer)
+        auto_assign_org_role: Editor
+
+      # (optional) anonymous access configuration:
+      auth.anonymous:
+        # if true users visiting the UI don't need to login
+        enabled: false        # <-- set to `true` only if you want *anyone* to access without logging in
+        org_role: Editor      # role given to anonymous sessions (Editor, Viewer, Admin)
+
+    # alternatively you can set env vars instead of grafana.ini if you prefer:
+    env:
+      - name: GF_USERS_ALLOW_SIGN_UP
+        value: "true"
+      - name: GF_USERS_AUTO_ASSIGN_ORG
+        value: "true"
+      - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
+        value: "Editor"
+      # anonymous via env:
+      #- name: GF_AUTH_ANONYMOUS_ENABLED
+      #  value: "true"
+      #- name: GF_AUTH_ANONYMOUS_ORG_ROLE
+      #  value: "Editor"
 
   alertmanager:
     config:
