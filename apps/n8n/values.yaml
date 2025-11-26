@@ -335,6 +335,8 @@ n8n:
         value: "true"
       N8N_PORT:
         value: "5678"
+      QUEUE_HEALTH_CHECK_ACTIVE: 
+        value: "true"
 
     # Define the number of jobs a worker can run in parallel by using the concurrency flag. Default is 10
     concurrency: 10
@@ -470,8 +472,8 @@ n8n:
     #   failureThreshold: 6
     #   successThreshold: 1
 
-    livenessProbe:
-    readinessProbe:
+    # livenessProbe:
+    # readinessProbe:
 
     # List of initialization containers belonging to the pod. Init containers are executed in order prior to containers being started.
     # See https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
