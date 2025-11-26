@@ -1,4 +1,0 @@
-techrar:
-  apps:
-    core-cron:
-      image: random/techrar/core:dev-123456789

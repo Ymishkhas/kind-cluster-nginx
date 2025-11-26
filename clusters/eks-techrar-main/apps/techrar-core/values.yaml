@@ -1,4 +1,0 @@
-techrar:
-  apps:
-    core:
-      image: random/techrar/core:dev-123456789

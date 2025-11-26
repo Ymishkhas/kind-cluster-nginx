@@ -1,4 +1,0 @@
-techrar:
-  apps:
-    core-queue:
-      image: random/techrar/core:dev-123456789
