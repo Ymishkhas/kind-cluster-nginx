@@ -30,13 +30,13 @@ kube-prometheus-stack:
         org_role: Editor      # role given to anonymous sessions (Editor, Viewer, Admin)
 
     # alternatively you can set env vars instead of grafana.ini if you prefer:
-    env:
-      - name: GF_USERS_ALLOW_SIGN_UP
-        value: "true"
-      - name: GF_USERS_AUTO_ASSIGN_ORG
-        value: "true"
-      - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
-        value: "Editor"
+    # env:
+    #   - name: GF_USERS_ALLOW_SIGN_UP
+    #     value: "true"
+    #   - name: GF_USERS_AUTO_ASSIGN_ORG
+    #     value: "true"
+    #   - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
+    #     value: "Editor"
       # anonymous via env:
       #- name: GF_AUTH_ANONYMOUS_ENABLED
       #  value: "true"
