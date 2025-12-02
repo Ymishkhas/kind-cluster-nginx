@@ -12,8 +12,9 @@ n8n:
   main:
     # config and secret will be shared between main/worker. No need to duplicate.
     config:
-      executions:
-        mode: queue
+      executions_mode: "queue"
+      webhook_url: http://n8n.localhost
+      n8n_metrics: "true"
       queue:
         health:
           check:
@@ -27,7 +28,6 @@ n8n:
             # password: ""
       generic:
         timezone: Asia/Riyadh
-      webhook_url: http://n8n.localhost
 
     # secrets in secrets.yaml
     # secret: {}
