@@ -1,10 +1,13 @@
 n8n:
+  # imagePullSecrets:
+  #   - name: docker-auth
   image:
     repository: n8nio/n8n
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
   imagePullSecrets: []
+
 
   ingress:
     enabled: false
@@ -23,8 +26,9 @@ n8n:
         editor_base_url: "http://n8n.localhost"
         secure_cookie: "false" # For testing
         ai_assistant_base_url: "https://api.aixlabs.com/v1/assistants/n8n"
-        metrics: "true"
+        # metrics: "true"
         email_mode: "smtp" # configuration in secrets
+        # enforce_settings_file_permissions: "true"
       queue:
         health_check:
             active: true
@@ -43,7 +47,11 @@ n8n:
     # secret: {}
 
     # Check: https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
-    # extraEnv: {}
+    extraEnv:
+      OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
+        value: "true"
+      N8N_METRICS:
+        value: "true"
 
     persistence:
       # If true, use a Persistent Volume Claim, If false, use emptyDir
@@ -205,7 +213,7 @@ n8n:
       # -- Service port
       port: 80
 
-    resources: {}
+    # resources: {}
     # We usually recommend not specifying default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -216,6 +224,20 @@ n8n:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+    # resources:
+    #   requests:
+    #     cpu: 200m
+    #     memory: 300Mi
+    #   limits:
+    #     cpu: 500m
+    #     memory: 500Mi
+
+    # resources:
+    #   requests:
+    #     cpu: 200m
+    #     memory: 300Mi
+    #   limits:
+    #     memory: 1000Mi
 
     autoscaling:
       enabled: false
@@ -396,7 +418,7 @@ n8n:
       # -- Service port
       port: 80
 
-    resources: {}
+    # resources: {}
     # We usually recommend not specifying default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -407,6 +429,12 @@ n8n:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+    # resources:
+    #   requests:
+    #     cpu: 300m
+    #     memory: 650Mi
+    #   limits:
+    #     memory: 1500Mi
 
     autoscaling:
       enabled: false
@@ -585,7 +613,7 @@ n8n:
       # -- Service port
       port: 80
 
-    resources: {}
+    # resources: {}
     # We usually recommend not specifying default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -596,6 +624,13 @@ n8n:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+    # resources:
+    #   requests:
+    #     cpu: 250m
+    #     memory: 256Mi
+    #   limits:
+    #     memory: 1Gi
+
     autoscaling:
       enabled: false
       minReplicas: 1
@@ -675,10 +710,16 @@ n8n:
       enabled: false
     dataStorage:
       enabled: false
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 100m
+    # resources:
+    #   requests:
+    #     memory: 256Mi
+    #     cpu: 100m
+    persistence:
+      enabled: true
+      # storageClass: gp3
+      size: 10Gi
+      accessModes:
+        - ReadWriteOnce
     # enabled: true
     # architecture: standalone
     # image:
