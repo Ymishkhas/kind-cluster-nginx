@@ -3,24 +3,32 @@ n8n:
     repository: n8nio/n8n
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "1.120.0"
+    tag: ""
   imagePullSecrets: []
 
   ingress:
     enabled: false
 
   main:
-    # config and secret will be shared between main/worker. No need to duplicate.
+    # config and secret will be shared between main/worker/webhook. No need to duplicate.
     config:
       executions_mode: "queue"
       webhook_url: http://n8n.localhost
-      n8n_metrics: "true"
-      n8n_email_mode: "smtp" # configuration in secrets
-      db_type: "postgresdb" # configuration in secrets
+      db:
+        type: "postgresdb" # configuration in secrets
+      n8n:
+        host: "n8n.localhost"
+        port: 5678
+        templates_enabled: "true"
+        editor_base_url: "http://n8n.localhost"
+        secure_cookie: "false" # For testing
+        ai_assistant_base_url: "https://api.aixlabs.com/v1/assistants/n8n"
+        metrics: "true"
+        email_mode: "smtp" # configuration in secrets
       queue:
-        health:
-          check:
+        health_check:
             active: true
+            port: 5678
         bull:
           redis:
             host: n8n-valkey
@@ -35,29 +43,7 @@ n8n:
     # secret: {}
 
     # Check: https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
-    extraEnv:
-      N8N_HOST: 
-        value: "n8n.localhost"
-      N8N_PORT:
-        value: "5678"
-      N8N_METRICS:
-        value: "true" 
-      N8N_AI_ASSISTANT_BASE_URL:
-        value: "https://api.aixlabs.com/v1/assistants/n8n"
-      N8N_TEMPLATES_ENABLED:
-        value: "true"
-      N8N_EDITOR_BASE_URL:
-        value: "http://n8n.localhost"
-      N8N_SECURE_COOKIE: # For testing
-        value: "false"
-      # N8N_HIDE_USAGE_PAGE:
-      #   value: "false"
-      # N8N_LICENSE_ACTIVATION_KEY:
-      #   value: ""
-      # N8N_RUNNERS_ENABLED:
-      #   value: "true"
-      # N8N_RUNNERS_MODE:
-      #   value: "external"
+    # extraEnv: {}
 
     persistence:
       # If true, use a Persistent Volume Claim, If false, use emptyDir
@@ -259,21 +245,7 @@ n8n:
     secret: {}
 
     # Check: https://docs.n8n.io/hosting/configuration/environment-variables/ for all values.
-    extraEnv:
-      N8N_HOST: 
-        value: "n8n.localhost"
-      N8N_PORT:
-        value: "5678"
-      N8N_METRICS:
-        value: "true" 
-      N8N_AI_ASSISTANT_BASE_URL:
-        value: "https://api.aixlabs.com/v1/assistants/n8n"
-      N8N_TEMPLATES_ENABLED:
-        value: "true"
-      N8N_EDITOR_BASE_URL:
-        value: "http://n8n.localhost"
-      N8N_SECURE_COOKIE: # For testing
-        value: "false"
+    extraEnv: {}
 
     # Define the number of jobs a worker can run in parallel by using the concurrency flag. Default is 10
     concurrency: 10
@@ -465,26 +437,6 @@ n8n:
     # extraEnv: {}
     #   WEBHOOK_URL:
     #     value: "http://webhook.domain.tld"
-    extraEnv:
-      N8N_HOST: 
-        value: "n8n.localhost"
-      N8N_PORT:
-        value: "5678"
-      N8N_METRICS:
-        value: "true" 
-      N8N_AI_ASSISTANT_BASE_URL:
-        value: "https://api.aixlabs.com/v1/assistants/n8n"
-      N8N_TEMPLATES_ENABLED:
-        value: "true"
-      N8N_EDITOR_BASE_URL:
-        value: "http://n8n.localhost"
-      N8N_SECURE_COOKIE: # For testing
-        value: "false"
-      QUEUE_HEALTH_CHECK_ACTIVE:
-        value: "true"
-      # WEBHOOK_URL:
-      #   value: "http://webhook.domain.tld"
-
 
     #
     # Webhook Kubernetes specific settings
