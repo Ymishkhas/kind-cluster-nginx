@@ -15,6 +15,8 @@ n8n:
       executions_mode: "queue"
       webhook_url: http://n8n.localhost
       n8n_metrics: "true"
+      n8n_email_mode: "smtp" # configuration in secrets
+      db_type: "postgresdb" # configuration in secrets
       queue:
         health:
           check:
