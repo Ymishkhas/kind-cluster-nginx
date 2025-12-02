@@ -44,8 +44,6 @@ n8n:
         value: "https://api.aixlabs.com/v1/assistants/n8n"
       N8N_TEMPLATES_ENABLED:
         value: "true"
-      WEBHOOK_URL:
-        value: "http://n8n.localhost"
       N8N_EDITOR_BASE_URL:
         value: "http://n8n.localhost"
       N8N_SECURE_COOKIE: # For testing
@@ -270,8 +268,6 @@ n8n:
         value: "https://api.aixlabs.com/v1/assistants/n8n"
       N8N_TEMPLATES_ENABLED:
         value: "true"
-      WEBHOOK_URL:
-        value: "http://n8n.localhost"
       N8N_EDITOR_BASE_URL:
         value: "http://n8n.localhost"
       N8N_SECURE_COOKIE: # For testing
@@ -478,16 +474,12 @@ n8n:
         value: "https://api.aixlabs.com/v1/assistants/n8n"
       N8N_TEMPLATES_ENABLED:
         value: "true"
-      WEBHOOK_URL:
-        value: "http://n8n.localhost"
       N8N_EDITOR_BASE_URL:
         value: "http://n8n.localhost"
       N8N_SECURE_COOKIE: # For testing
         value: "false"
       QUEUE_HEALTH_CHECK_ACTIVE:
         value: "true"
-      WEBHOOK_URL:
-        value: "http://webhook.domain.tld"
 
 
     #
