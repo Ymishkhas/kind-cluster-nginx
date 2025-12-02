@@ -1,0 +1,17 @@
+postgresql:
+  enabled: true
+  # auth:
+  #   username: n8n
+  #   password: "n8n"
+  #   database: n8n
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi  # Adjust based on expected workflow data
+    # resources:
+    #   requests:
+    #     memory: "256Mi"
+    #     cpu: "250m"
+    #   limits:
+    #     memory: "512Mi"
+    #     cpu: "500m"
