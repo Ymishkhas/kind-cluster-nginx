@@ -172,10 +172,9 @@ n8n:
 
     resources:
       requests:
-        cpu: 150m
+        cpu: 200m
         memory: 300Mi
       limits:
-        cpu: 500m
         memory: 700Mi
 
     autoscaling:
@@ -267,11 +266,10 @@ n8n:
 
     resources:
       requests:
-        cpu: 200m
-        memory: 400Mi
+        cpu: 300m
+        memory: 650Mi
       limits:
-        cpu: 1000m
-        memory: 1Gi
+        memory: 1000Mi
 
     autoscaling:
       enabled: true
@@ -376,8 +374,7 @@ n8n:
         cpu: 100m
         memory: 200Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
+        memory: 500Mi
 
     autoscaling:
       enabled: false
