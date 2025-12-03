@@ -68,7 +68,7 @@ n8n:
 
 
     persistence:
-      enabled: true
+      enabled: false
       type: dynamic
       # storageClass: "gp3"
       size: 5Gi
