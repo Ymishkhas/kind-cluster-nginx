@@ -441,6 +441,15 @@ n8n:
         hosts:
         - n8n.localhost
         http:
+        # Webhook routes
+        - match:
+          - uri:
+              prefix: /webhook
+          route:
+          - destination:
+              host: n8n-webhook.n8n.svc.cluster.local
+              port:
+                number: 80
         - match:
           - uri:
               prefix: /
