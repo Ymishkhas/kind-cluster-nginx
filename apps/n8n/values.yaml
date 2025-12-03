@@ -12,10 +12,15 @@ n8n:
   ingress:
     enabled: false
 
+  # disable Webhooks from the main process, but you enable the processing on a different Webhook instance.
+  # See https://github.com/8gears/n8n-helm-chart/issues/39#issuecomment-1579991754 for the full explanation.
+  # scaling.webhook.enabled: true
+  
   main:
     # config and secret will be shared between main/worker/webhook. No need to duplicate.
     config:
       executions_mode: "queue"
+      executions_process: "main"
       webhook_url: http://n8n.localhost
       db:
         type: "postgresdb" # configuration in secrets
@@ -54,16 +59,21 @@ n8n:
     extraEnv:
       OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
         value: "true"
+      N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
+        value: "true"
       N8N_METRICS:
         value: "true"
       N8N_PROXY_HOPS:
         value: "1"
+
 
     persistence:
       enabled: true
       type: dynamic
       # storageClass: "gp3"
       size: 5Gi
+      accessModes:
+        - ReadWriteOnce
 
     extraVolumes: []
     extraVolumeMounts: []
@@ -198,6 +208,10 @@ n8n:
     config: {}
     secret: {}
     extraEnv: {}
+    # extraEnv:
+    #   N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
+    #     value: "true"
+
 
     concurrency: 10
 
@@ -282,17 +296,17 @@ n8n:
     # Pod termination grace period in seconds
     terminationGracePeriodSeconds: 30
 
-
-  # disable Webhooks from the main process, but you enable the processing on a different Webhook instance.
-  # See https://github.com/8gears/n8n-helm-chart/issues/39#issuecomment-1579991754 for the full explanation.
-  scaling.webhook.enabled: true
-
   # Webhook related settings
   webhook:
     enabled: true
     # additional (to main) config for webhook
     config: {}
     secret: {}
+    extraEnv:
+      OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
+        value: "true"
+      N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
+        value: "false"
 
     persistence:
       enabled: false
