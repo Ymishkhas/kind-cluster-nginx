@@ -59,8 +59,8 @@ n8n:
     extraEnv:
       OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
         value: "true"
-      N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
-        value: "true"
+      # N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
+      #   value: "true"
       N8N_METRICS:
         value: "true"
       N8N_PROXY_HOPS:
@@ -305,8 +305,8 @@ n8n:
     extraEnv:
       OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
         value: "true"
-      N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
-        value: "false"
+      # N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
+      #   value: "false"
 
     persistence:
       enabled: false
