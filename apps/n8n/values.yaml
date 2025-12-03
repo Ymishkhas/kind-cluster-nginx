@@ -71,7 +71,7 @@ n8n:
       enabled: true
       type: dynamic
       # storageClass: "gp3"
-      size: 5Gi
+      size: 1Gi
       accessModes:
         - ReadWriteOnce
 
