@@ -440,7 +440,7 @@ n8n:
       kind: ServiceMonitor
       metadata:
         name: n8n-metrics
-        namespace: tools
+        namespace: n8n
         labels:
           release: monitoring
       spec:
