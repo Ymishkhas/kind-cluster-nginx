@@ -8,14 +8,9 @@ n8n:
     tag: "" # Uses chart appVersion
   imagePullSecrets: []
 
-
   ingress:
     enabled: false
 
-  # disable Webhooks from the main process, but you enable the processing on a different Webhook instance.
-  # See https://github.com/8gears/n8n-helm-chart/issues/39#issuecomment-1579991754 for the full explanation.
-  # scaling.webhook.enabled: true
-  
   main:
     # config and secret will be shared between main/worker/webhook. No need to duplicate.
     config:
@@ -38,6 +33,7 @@ n8n:
         block_env_access_in_node: "false"
         log_level: "info"
         log_output: "console"
+        metrics: "true"
       queue:
         health_check:
             active: true
@@ -61,8 +57,8 @@ n8n:
         value: "true"
       # N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
       #   value: "true"
-      N8N_METRICS:
-        value: "true"
+      # N8N_METRICS:
+      #   value: "true"
       N8N_PROXY_HOPS:
         value: "1"
 
@@ -82,7 +78,9 @@ n8n:
     replicaCount: 1
 
     deploymentStrategy:
-      type: Recreate
+      type: RollingUpdate
+      maxSurge: 1
+      maxUnavailable: 0
 
     serviceAccount:
       create: true
@@ -303,8 +301,8 @@ n8n:
     extraEnv:
       OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS:
         value: "true"
-      # N8N_DISABLE_PRODUCTION_MAIN_PROCESS:
-      #   value: "false"
+      N8N_PROXY_HOPS:
+        value: "1"
 
     persistence:
       enabled: false
@@ -315,9 +313,9 @@ n8n:
     replicaCount: 1
 
     deploymentStrategy:
-     type: RollingUpdate
-     maxSurge: "50%"
-     maxUnavailable: "50%"
+      type: RollingUpdate
+      maxSurge: "25%"
+      maxUnavailable: "25%"
 
     nameOverride: ""
     fullnameOverride: ""
@@ -379,7 +377,7 @@ n8n:
     autoscaling:
       enabled: false
       minReplicas: 1
-      maxReplicas: 100
+      maxReplicas: 4
       targetCPUUtilizationPercentage: 80
       # targetMemoryUtilizationPercentage: 80
     nodeSelector: {}
@@ -447,14 +445,14 @@ n8n:
               host: n8n-webhook.n8n.svc.cluster.local
               port:
                 number: 80
-        # - match:
-        #   - uri:
-        #       prefix: /webhook-test
-        #   route:
-        #   - destination:
-        #       host: n8n-webhook.n8n.svc.cluster.local
-        #       port:
-        #         number: 80
+        - match:
+          - uri:
+              prefix: /webhook-test
+          route:
+          - destination:
+              host: n8n-webhook.n8n.svc.cluster.local
+              port:
+                number: 80
         - match:
           - uri:
               prefix: /
@@ -463,11 +461,11 @@ n8n:
               host: n8n.n8n.svc.cluster.local # service-name.namespace.svc.cluster.local
               port:
                 number: 80
-    # ServiceMonitor for Prometheus
+    # ServiceMonitor for Prometheus - Main
     - apiVersion: monitoring.coreos.com/v1
       kind: ServiceMonitor
       metadata:
-        name: n8n-metrics
+        name: n8n-main-metrics
         namespace: n8n
         labels:
           release: monitoring
@@ -481,6 +479,42 @@ n8n:
           path: /metrics
           interval: 30s
           scrapeTimeout: 10s
+    # ServiceMonitor for Prometheus - Worker
+    - apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: n8n-worker-metrics
+        namespace: n8n
+        labels:
+          release: monitoring
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: n8n
+            app.kubernetes.io/component: worker
+        endpoints:
+        - port: http
+          path: /metrics
+          interval: 30s
+          scrapeTimeout: 10s
+    # ServiceMonitor for Prometheus - Webhook
+    # - apiVersion: monitoring.coreos.com/v1
+    #   kind: ServiceMonitor
+    #   metadata:
+    #     name: n8n-webhook-metrics
+    #     namespace: n8n
+    #     labels:
+    #       release: monitoring
+    #   spec:
+    #     selector:
+    #       matchLabels:
+    #         app.kubernetes.io/name: n8n
+    #         app.kubernetes.io/component: webhook
+    #     endpoints:
+    #     - port: http
+    #       path: /metrics
+    #       interval: 30s
+    #       scrapeTimeout: 10s
 
 
 valkey:
