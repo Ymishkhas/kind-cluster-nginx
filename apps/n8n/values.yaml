@@ -222,8 +222,8 @@ n8n:
 
     deploymentStrategy:
       type: RollingUpdate
-      maxSurge: "25%"
-      maxUnavailable: "25%"
+      maxSurge: "50%"
+      maxUnavailable: "50%"
 
     serviceAccount:
       create: true
@@ -314,8 +314,8 @@ n8n:
 
     deploymentStrategy:
       type: RollingUpdate
-      maxSurge: "25%"
-      maxUnavailable: "25%"
+      maxSurge: "50%"
+      maxUnavailable: "50%"
 
     nameOverride: ""
     fullnameOverride: ""
