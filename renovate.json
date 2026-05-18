@@ -1,11 +1,30 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "onboarding": false,
-  "requireConfig": "optional",
-  "repositories": ["Ymishkhas/kind-cluster-nginx"],
   "enabledManagers": ["helmv3"],
-  "helmv3": {
-    "fileMatch": ["apps/.+/Chart\\.yaml$"]
-  }
+  "dependencyDashboard": true,
+  "semanticCommits": "enabled",
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "additionalBranchPrefix": "{{parentDir}}/",
+  "packageRules": [
+    {
+      "description": "Ignore all internal chartmuseum dependencies",
+      "matchRegistryUrls": ["@chartmuseum"],
+      "enabled": false
+    },
+    {
+      "description": "Istio - must stay in sync across base/istiod/gateway",
+      "matchPackageNames": ["base", "istiod", "gateway"],
+      "matchRegistryUrls": ["https://istio-release.storage.googleapis.com/charts"],
+      "groupName": "istio",
+      "labels": ["istio"]
+    },
+    {
+      "description": "Major updates always need manual approval via dashboard",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "labels": ["major"]
+    }
+  ]
 }
