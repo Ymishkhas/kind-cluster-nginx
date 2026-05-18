@@ -8,6 +8,6 @@ dependencies:
   name: postgresql
   condition: preview.database.enabled
 - repository: "oci://registry-1.docker.io/bitnamicharts"
-  version: 24.0.0
+  version: 24.1.8
   name: redis
   condition: preview.redis.enabled
