@@ -5,5 +5,5 @@ description: Istio Ingress Gateway (ClusterIP)
 type: application
 dependencies:
   - name: gateway
-    version: 1.27.1
+    version: 1.29.2
     repository: https://istio-release.storage.googleapis.com/charts
