@@ -8,6 +8,6 @@ dependencies:
     name: n8n
     alias: n8n
   - repository: oci://registry-1.docker.io/bitnamicharts
-    version: 5.0.8
+    version: 5.6.5
     name: valkey
     condition: valkey.enabled
