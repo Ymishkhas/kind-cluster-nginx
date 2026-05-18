@@ -13,7 +13,7 @@ jobs:
         id: get_token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ vars.APP_CLIENT_ID }}
+          app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v46.1.14
